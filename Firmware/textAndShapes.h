@@ -8,7 +8,7 @@ const char lowerText[]  = "Spinner";
 const char rpmText[]    = "RPM";   
 const char revText[]    = "REV";
 
-const uint8_t PROGMEM shape_1[] = { // heart
+const char PROGMEM shape_1[] = { // heart
   0x80,
   0x80,
   0x80,
