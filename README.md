@@ -8,7 +8,7 @@ Based on this project: http://www.instructables.com/id/Geek-Spinner/
 
 	- Attiny84-20SSU
 	- 8 x 3 mm Red leds
-	- Blue led
+	- SMD Blue led
 	- 8 x 330mOhms resistors
 	- Push button
 	- CR2032 battery holder: https://lcsc.com/product-detail/Battery-Holders-Clips-Contacts_CR2032Curved-feet-3V_C70373.html
