@@ -20,7 +20,7 @@ Based on this project: http://www.instructables.com/id/Geek-Spinner/
 
 **3D Model**
 
-<img src="PCB/3D.jpg" width=400> <img src="PCB/PCB.jpg" width=400>
+<img src="PCB/3D.jpg" width=400>
 
 
 
