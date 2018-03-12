@@ -17,3 +17,12 @@ Based on this project: http://www.instructables.com/id/Geek-Spinner/
 	- SMD switch : https://lcsc.com/product-detail/Toggle-Switches_9mm-3-5mm_C92658.html
 	- 2x3 header: https://lcsc.com/product-detail/Male-Header_Headers-Pins-2-3P-2-54mm-SMD_C124390.html
 
+
+**3D Model**
+
+<img src="PCB/3D.jpg" width=400> <img src="PCB/PCB.jpg" width=400>
+
+
+
+
+
