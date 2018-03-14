@@ -113,20 +113,55 @@ int8_t NumberOfDigits(uint16_t number) {
 
 
 // Print shapes
-void ShowShape( const char shape[], uint8_t shapeSize){
-
-	uint16_t calculatedDelay = CalculateDelay(millisRev);
+void ShowShape( const char shape[], uint8_t shapeSize, uint16_t delay){
 
 	for ( int idx=0; idx< shapeSize; idx++)
 	{
 		PORTA = pgm_read_byte_near(shape+idx);
-		Delay_Us(calculatedDelay);
+		Delay_Us(delay);
 	}
 	
 	PORTA = 0x00;
-	magnetFlag=0;
 	
 };
+
+// Print upper text
+void ShowUpperText(const char text[], uint8_t textSize, uint16_t delay) {
+
+	for(int ch=0; ch < textSize; ch++) {										// iterates over each character
+				
+		for (int col=0; col < 5; col++)											// iterate over each column
+		{
+			uint8_t column = pgm_read_byte_near(&(font[text[ch]-32][col]));
+					
+			for (int dot=0; dot < 8; dot++)										// iterate over each dot
+			{
+				// Swap bits
+				if (column & (1 << dot)) PORTA |= (uint8_t) (0x80 >> dot);		// (uint8_t) is necessary,if not the byte is filled with '1'
+			}
+			Delay_Us(delay);
+			PORTA = 0x00;
+		}
+				
+		Delay_Us(delay);
+				
+	}
+}
+
+// Print lower text
+void ShowLowerText(const char text[], uint8_t textSize, uint16_t delay) {
+
+	for (int ch = textSize-2; ch>=0; ch--) {									// iterates over each character
+		for (int col=4; col>=0; col--)											// iterates over each column
+		{
+			PORTA = pgm_read_byte_near(&(font[text[ch]-32][col]));
+			Delay_Us(delay);
+			PORTA=0x00;
+		}
+		Delay_Us(delay);
+	}
+}
+
 
 
 int main(void)
@@ -228,7 +263,10 @@ int main(void)
 		if (mode==2 && magnetFlag==1 && spinning==1)
 		{
 
-			ShowShape(shape_2, sizeof(shape_2));
+			uint16_t calculatedDelay = CalculateDelay(millisRev);	// Calculate delay
+			ShowShape(shape_2, sizeof(shape_2), calculatedDelay);	// Show shape
+			magnetFlag=0;
+
 
 		}
 	
@@ -236,8 +274,9 @@ int main(void)
 		// Fan
 		if (mode==3 && magnetFlag==1 && spinning==1)
 		{
-
-			ShowShape(shape_3, sizeof(shape_3));
+			uint16_t calculatedDelay = CalculateDelay(millisRev);	// Calculate delay
+			ShowShape(shape_3, sizeof(shape_3), calculatedDelay);	// Show shape
+			magnetFlag=0;
 
 		}
 
@@ -247,8 +286,10 @@ int main(void)
 		// Heart
 		if (mode==4 && spinning == 1 && magnetFlag== 1)
 		{
-			
-			ShowShape(shape_1, sizeof(shape_1));
+
+			uint16_t calculatedDelay = CalculateDelay(millisRev);	// Calculate delay
+			ShowShape(shape_1, sizeof(shape_1), calculatedDelay);	// Show shape
+			magnetFlag=0;
 
 		}		
 		
@@ -257,50 +298,15 @@ int main(void)
 		// RPM
 		if (mode==5 && magnetFlag==1 && spinning==1){
 			
-			uint16_t calculatedDelay = CalculateDelay(millisRev);
+			uint16_t calculatedDelay = CalculateDelay(millisRev);				// Calculate delay
 			
 			uint16_t rpm = (oldTimer0_OV *0.256);
-			rpm = 60000 / rpm;															// Calculate rpm
-			//uint16_t rpm = oldTimer0_OV;
-			sprintf(rpmString, "%d", rpm);												// rpm(int) to string
+			rpm = 60000 / rpm;													// Calculate rpm
+			sprintf(rpmString, "%d", rpm);										// rpm(int) to string
 
-
-			//PRINT UPPER TEXT
-			for(int ch=0; ch < NumberOfDigits(rpm); ch++) {								// iterates over each character
-				
-				for (int col=0; col < 5; col++)											// iterate over each column
-				{
-					uint8_t column = pgm_read_byte_near(&(font[rpmString[ch]-32][col]));
-					
-					for (int dot=0; dot < 8; dot++)										// iterate over each dot
-					{
-						// Swap bits
-						if (column & (1 << dot)) PORTA |= (uint8_t) (0x80 >> dot);		// (uint8_t) is necessary,if not the byte is filled with '1'
-					}
-					Delay_Us(calculatedDelay);
-					PORTA = 0x00;
-				}
-				
-				Delay_Us(calculatedDelay);
-				
-			}
-			
-			//Wait to print lower text
-			DelayLowerText(NumberOfDigits(rpm), calculatedDelay);
-			
-			//PRINT LOWER TEXT
-			for (int ch = 2; ch>=0; ch--) {												// iterates over each character
-				for (int col=4; col>=0; col--)											// iterates over each column
-				{
-					PORTA = pgm_read_byte_near(&(font[rpmText[ch]-32][col]));
-					Delay_Us(calculatedDelay);
-					PORTA=0x00;
-				}
-				Delay_Us(calculatedDelay);
-			}
-
-
-			
+			ShowUpperText(rpmString, NumberOfDigits(rpm), calculatedDelay);		// Print upper text
+			DelayLowerText(NumberOfDigits(rpm), calculatedDelay);				// Wait to print lower text
+			ShowLowerText(rpmText,sizeof(rpmText), calculatedDelay);			// Print lower text
 			magnetFlag = 0;
 			
 			
@@ -311,46 +317,12 @@ int main(void)
 		// Total revolutions
 		if (mode==6 && magnetFlag ==1 && spinning ==1) {
 			
-			uint16_t calculatedDelay = CalculateDelay(millisRev);						// Calculate delay for this revolution
-			
-			sprintf(revsString, "%d", revs);											// change "int" variable to string
+			uint16_t calculatedDelay = CalculateDelay(millisRev);				// Calculate delay for this revolution
+			sprintf(revsString, "%d", revs);									// change "int" variable to string
 
-			//PRINT UPPER TEXT
-			for(int ch=0; ch < NumberOfDigits(revs); ch++) {							// iterates over each character
-				
-				for (int col=0; col < 5; col++)											// iterate over each column
-				{
-					uint8_t column = pgm_read_byte_near(&(font[revsString[ch]-32][col]));
-					
-					for (int dot=0; dot < 8; dot++)										// iterate over each dot
-					{
-						// Swap bits
-						if (column & (1 << dot)) PORTA |= (uint8_t) (0x80 >> dot);		// (uint8_t) is necessary,if not the byte is filled with '1'
-					}
-					Delay_Us(calculatedDelay);
-					PORTA = 0x00;
-				}
-				
-				Delay_Us(calculatedDelay);
-				
-			}
-			
-			//Wait to print lower text
-			DelayLowerText(NumberOfDigits(revs), calculatedDelay);
-			
-			//PRINT LOWER TEXT
-			for (int ch = 2; ch>=0; ch--) {												// iterates over each character
-				for (int col=4; col>=0; col--)											// iterates over each column
-				{
-					PORTA = pgm_read_byte_near(&(font[revText[ch]-32][col]));
-					Delay_Us(calculatedDelay);
-					PORTA=0x00;
-				}
-				Delay_Us(calculatedDelay);
-			}
-
-
-			
+			ShowUpperText(revsString, NumberOfDigits(revs), calculatedDelay);	// Print upper text
+			DelayLowerText(NumberOfDigits(revs), calculatedDelay);				// Wait to print lower text
+			ShowLowerText(revText, sizeof(revText), calculatedDelay);			// Print lower text
 			magnetFlag = 0;
 			
 		}
@@ -359,45 +331,11 @@ int main(void)
 		// TEXT		
 		if (mode==7 && magnetFlag == 1 && spinning==1) {
 			
-			
-			uint16_t calculatedDelay = CalculateDelay(millisRev);						// Calculate delay for this revolution
-			
-			
-			//PRINT UPPER TEXT
-			for(int ch=0; ch < sizeof(upperText)-1; ch++) {								// iterates over each character
+			uint16_t calculatedDelay = CalculateDelay(millisRev);				// Calculate delay for this revolution
 
-				for (int col=0; col < 5; col++)											// iterate over each column			
-				{
-
-					uint8_t column = pgm_read_byte_near(&(font[upperText[ch]-32][col]));
-					
-					for (int dot=0; dot < 8; dot++)										// iterate over each dot 
-					{
-						// Swap bits
-						if (column & (1 << dot)) PORTA |= (uint8_t) (0x80 >> dot);		// (uint8_t) is necessary,if not the byte is filled with '1'
-					}
-					Delay_Us(calculatedDelay);
-					PORTA = 0x00;	
-				}
-
-				Delay_Us(calculatedDelay);
-			}
-
-			// Delay to write lower text			
-			Delay_Us(calculatedDelay*3);
-			
-			//PRINT LOWER TEXT
-			for (int ch = sizeof(lowerText)-2; ch>=0; ch--) {								// iterates over each character
-
-				for (int col=4; col>=0; col--)												// iterates over each column
-				{
-					PORTA = pgm_read_byte_near(&(font[lowerText[ch]-32][col]));
-					Delay_Us(calculatedDelay);
-					PORTA=0x00;	
-				}			
-				Delay_Us(calculatedDelay);
-			}
-			
+			ShowUpperText(upperText, sizeof(upperText)-1, calculatedDelay);		// Print upper text
+			Delay_Us(calculatedDelay*3);										// Delay to print lower text
+			ShowLowerText(lowerText, sizeof(lowerText), calculatedDelay);		// Print lower text
 			magnetFlag = 0;
 			
 		}
@@ -407,63 +345,32 @@ int main(void)
 			static uint8_t repetitionCouneter = 0;
 			if (repetitionCouneter>80) repetitionCouneter = 0;
 
+			uint16_t calculatedDelay = CalculateDelay(millisRev);				// Calculate delay for this revolution
+
 			if (repetitionCouneter < 20) {
-				ShowShape(shape_1, sizeof(shape_1));
+				ShowShape(shape_1, sizeof(shape_1),calculatedDelay);
+				magnetFlag=0;
 				repetitionCouneter++;
 			}
 			
 			if (repetitionCouneter >=20 && repetitionCouneter < 40) {
-				ShowShape(shape_2, sizeof(shape_2));
+				ShowShape(shape_2, sizeof(shape_2), calculatedDelay);
+				magnetFlag=0;
 				repetitionCouneter++;
 			}
 			
 			if (repetitionCouneter >=40 && repetitionCouneter < 60) {
-				ShowShape(shape_3, sizeof(shape_2));
+				ShowShape(shape_3, sizeof(shape_2),calculatedDelay);
+				magnetFlag=0;
 				repetitionCouneter++;
 			}
 			
 			if (repetitionCouneter >= 60)
 			{
-				
-				
-				uint16_t calculatedDelay = CalculateDelay(millisRev);						// Calculate delay for this revolution
-							
-							
-				//PRINT UPPER TEXT
-				for(int ch=0; ch < sizeof(upperText)-1; ch++) {								// iterates over each character
 
-					for (int col=0; col < 5; col++)											// iterate over each column
-					{
-
-						uint8_t column = pgm_read_byte_near(&(font[upperText[ch]-32][col]));
-									
-						for (int dot=0; dot < 8; dot++)										// iterate over each dot
-						{
-							// Swap bits
-							if (column & (1 << dot)) PORTA |= (uint8_t) (0x80 >> dot);		// (uint8_t) is necessary,if not the byte is filled with '1'
-						}
-						Delay_Us(calculatedDelay);
-						PORTA = 0x00;
-					}
-
-					Delay_Us(calculatedDelay);
-				}
-
-				// Delay to write lower text
-				Delay_Us(calculatedDelay*3);
-							
-				//PRINT LOWER TEXT
-				for (int ch = sizeof(lowerText)-2; ch>=0; ch--) {								// iterates over each character
-
-					for (int col=4; col>=0; col--)												// iterates over each column
-					{
-						PORTA = pgm_read_byte_near(&(font[lowerText[ch]-32][col]));
-						Delay_Us(calculatedDelay);
-						PORTA=0x00;
-					}
-					Delay_Us(calculatedDelay);
-				}
-							
+				ShowUpperText(upperText, sizeof(upperText)-1, calculatedDelay);	// Print upper text
+				Delay_Us(calculatedDelay*3);									// Delay to print lower text
+				ShowLowerText(lowerText, sizeof(lowerText), calculatedDelay);	// Print lower text
 				magnetFlag = 0;
 				repetitionCouneter++;
 			}
