@@ -24,6 +24,14 @@ Based on this project: http://www.instructables.com/id/Geek-Spinner/
 
 <img src="PCB/3D.jpg" width=400>
 
+**Video**
+
+[(http://img.youtube.com/vi/f8Oj__So2bI/0.jpg)](https://www.youtube.com/watch?v=f8Oj__So2bI "POV Spinner")
+
+
+
+
+
 
 
 
