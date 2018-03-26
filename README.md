@@ -26,7 +26,7 @@ Based on this project: http://www.instructables.com/id/Geek-Spinner/
 
 **Video**
 
-[(http://img.youtube.com/vi/f8Oj__So2bI/0.jpg)](https://www.youtube.com/watch?v=f8Oj__So2bI "POV Spinner")
+[![POV Spinner](http://img.youtube.com/vi/f8Oj__So2bI/0.jpg)](https://www.youtube.com/watch?v=f8Oj__So2bI "POV Spinner")
 
 
 
