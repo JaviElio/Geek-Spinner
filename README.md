@@ -2,7 +2,11 @@
 POV Spinner
 
 
-Based on this project: http://www.instructables.com/id/Geek-Spinner/
+Based on this project: 
+	
+	- Title:	GEEK SPINNER	
+	- Author:	MakersBox
+	- Link:		http://www.instructables.com/id/Geek-Spinner/
 
 **BOM**
 
